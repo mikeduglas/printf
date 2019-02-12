@@ -4,6 +4,23 @@ Function *printf* returns the string pointed by 1st argument pFmt.
 If pFmt includes format specifiers (subsequences beginning with %),  
 the additional arguments following format are formatted and inserted in the resulting string replacing their respective specifiers.  
   
+## Format specifiers
+```
+%% - a single %
+%c - a character
+%s - a CLIPped string
+%S - a quoted CLIPped string
+%z - a string
+%Z - a quoted string
+%i - an integer
+%x - an int in hex (lower case)
+%X - an int in hex (upper case)
+%f - a float
+%e - a float in scientific notation (@E15.4)
+%d - a date (Windows setting for Short date)
+%t - a time (Windows setting for Short time)
+```
+
 ## How to use
 Add following line inside the global map:  
 ```
