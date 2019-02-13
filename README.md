@@ -6,20 +6,25 @@ the additional arguments following format are formatted and inserted in the resu
   
 ## Format specifiers
 ```
-%% - a single %
-%c - a character
+%% - a single % (percent sign)
+%c - a character (first character of passed argument)
+%C - a Character in upper case (first character of passed argument)
 %s - a CLIPped string
 %S - a quoted CLIPped string
-%z - a string
-%Z - a quoted string
+%z - a not clipped string
+%Z - a quoted not clipped string
 %i - an integer
+%I - signed integer (with leading + for positive argument)
 %x - an int in hex (lower case)
-%X - an int in hex (upper case)
+%X - an int in HEX (UPPER CASE)
 %f - a float
-%e - a float in scientific notation (@E15.4)
-%d - a date (Windows setting for Short date)
-%t - a time (Windows setting for Short time)
+%e - a float in scientific notation (default picture token: @E15.4)
+%d - a date (default picture token: @d17, Windows setting for Short date)
+%t - a time (default picture token: @t7, Windows setting for Short time)
 ```
+s,S,z,Z,i,I,f,e,d,t specifiers may have additional picture token.  
+Picture token must be any valid Clarion picture token terminated by @.  
+For example: %d@d10-@ - date value formatted as yyyy-mm-dd.
 
 ## How to use
 Add following line inside the global map:  
@@ -31,13 +36,15 @@ then call printf(fmt, ...)  !- up to 21 arguments:
   !- CLIPped string
   MESSAGE(printf('Hello %s!', 'world'))
   !- CLIPped string, unCLIPped string, number, hex, HEX
-  MESSAGE(printf('%s, %z, %i, %x, %X', 'Some string    ', 'Some string   ', 1, 0abcdh, 0abcdh))
-  !- CLIPped quoted 'string', unCLIPped quoted 'string', number, hex, HEX
-  MESSAGE(printf('%S, %Z, %i, %x, %X', 'Some string    ', 'Some string   ', 1, 0abcdh, 0abcdh))
-  !- date, time
+  MESSAGE(printf('%s, %z, %i, %x, %X', 'Some string    ', 'Some string   ', 100, 43981, 43981))
+  !- CLIPped quoted 'string', unCLIPped quoted 'string', signed number, formatted number
+  MESSAGE(printf('%S, %Z, %I, %i@n12@', 'Some string    ', 'Some string   ', 100, 987654321))
+  !- date, time (default format)
   MESSAGE(printf('Current datetime is %d %t', TODAY(), CLOCK()))
+  !- date, time (custom format)
+  MESSAGE(printf('Current datetime is %d@d1@ %t@t4@', TODAY(), CLOCK()))
   !- float, float in scientific notation
-  MESSAGE(printf('%f  %e', 10.0/3.0, 10.0/3.0))
+  MESSAGE(printf('%f = %e', 10.0/3.0, 10.0/3.0))
 ```
 
 ## Requirements  

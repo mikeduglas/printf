@@ -1,3 +1,7 @@
+!** printf function.
+!** 13.02.2019
+!** mikeduglas66@yandex.com
+
   MODULE('printf.clw')
 
 !!!<summary>Returns the string pointed by pFmt. 
@@ -5,21 +9,27 @@
 !!!the additional arguments following format are formatted and inserted in the resulting string replacing their respective specifiers.
 !!!</summary>
 !!!<param name="pFmt">
-!!!%% - a single %
-!!!%c - a character
+!!!%% - a single % (percent sign)
+!!!%c - a character (first character of passed argument)
+!!!%C - a Character in upper case (first character of passed argument)
 !!!%s - a CLIPped string
 !!!%S - a quoted CLIPped string
-!!!%z - a string
-!!!%Z - a quoted string
+!!!%z - a not clipped string
+!!!%Z - a quoted not clipped string
 !!!%i - an integer
+!!!%I - signed integer (with leading + for positive argument)
 !!!%x - an int in hex (lower case)
-!!!%X - an int in hex (upper case)
+!!!%X - an int in HEX (upper case)
 !!!%f - a float
-!!!%e - a float in scientific notation (@E15.4)
-!!!%d - a date (Windows setting for Short date)
-!!!%t - a time (Windows setting for Short time)
+!!!%e - a float in scientific notation (default picture token: @E15.4)
+!!!%d - a date (default picture token: @d17, Windows setting for Short date)
+!!!%t - a time (default picture token: @t7, Windows setting for Short time)
+!!!
+!!!s,S,z,Z,i,I,f,e,d,t specifiers may have additional picture token.
+!!!Picture token must be any valid Clarion picture token terminated by @.
+!!!For example: %d@d10-@ - date value formatted as yyyy-mm-dd.
 !!!</param>
-!!!<returns>Formtted string</returns>
+!!!<returns>Formatted string</returns>
 printf  PROCEDURE(STRING pFmt, | 
       <? p1>,  <? p2>,  <? p3>,  <? p4>,  <? p5>,  <? p6>,  <? p7>,  <? p8>,  <? p9>,  <? p10>, |
       <? p11>, <? p12>, <? p13>, <? p14>, <? p15>, <? p16>, <? p17>, <? p18>, <? p19>, <? p20>), STRING
