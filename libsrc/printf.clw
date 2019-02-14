@@ -1,5 +1,5 @@
 !** printf function.
-!** 13.02.2019
+!** 14.02.2019
 !** mikeduglas66@yandex.com
 
   MEMBER
@@ -9,6 +9,8 @@
   MAP
     INCLUDE('CWUTIL.INC'),ONCE
     INCLUDE('printf.inc'), ONCE
+
+    urlEncode(STRING str, BOOL spaceAsPlus), STRING, PRIVATE
   END
 
 printf                        PROCEDURE(STRING pFmt, | 
@@ -78,7 +80,7 @@ tmp_picture                     STRING(20), AUTO
       END
       
       !- INLIST: There may be up to 25 liststring parameters
-      IF INLIST(pFmt[i+1], 'c', 'C', 's', 'S', 'z', 'Z', 'i', 'I', 'x', 'X', 'f', 'e', 'd', 't')
+      IF INLIST(pFmt[i+1], 'c', 'C', 's', 'S', 'z', 'Z', 'i', 'I', 'x', 'X', 'f', 'e', 'd', 't', 'u', 'U')
         !- get next argument
         curArgNdx += 1
         IF curArgNdx > numOfArgs
@@ -236,6 +238,17 @@ tmp_picture                     STRING(20), AUTO
           res = res & FORMAT(curArg, tmp_picture)
           i += 1 + (k-j+1)
         END
+        
+      OF    'u' !- url encoded string (the spaces get encoded to %20)
+      OROF  'U' !- url encoded string (the spaces get encoded to '+' sign)
+        IF pFmt[i+1] = 'u' 
+          res = res & urlEncode(curArg, FALSE)
+        ELSE
+          res = res & urlEncode(curArg, TRUE)
+        END
+        
+        i += 1
+
       END
     ELSE
       res = res & pFmt[i]
@@ -282,3 +295,28 @@ GetArg                        ROUTINE
     curArg = p20
   END
   
+urlEncode                     PROCEDURE(STRING str, BOOL spaceAsPlus)
+encoded                         ANY
+c                               STRING(1), AUTO
+v                               BYTE, AUTO
+i                               LONG, AUTO
+  CODE
+  LOOP i = 1 TO LEN(CLIP(str))
+    c = str[i]
+    IF ISALPHA(c) OR NUMERIC(c) OR INLIST(c, '-', '_', '.', '~')
+      encoded = encoded & c
+    ELSIF spaceAsPlus AND c = ' '
+      encoded = encoded &'+'      
+    ELSE
+      v = VAL(c)
+      IF v < 16
+        encoded = encoded &'%0'
+      ELSE
+        encoded = encoded &'%'
+      END
+      
+      encoded = encoded & ByteToHex(v)
+    END
+  END
+  
+  RETURN encoded

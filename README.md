@@ -21,6 +21,8 @@ the additional arguments following format are formatted and inserted in the resu
 %e - a float in scientific notation (default picture token: @E15.4)
 %d - a date (default picture token: @d17, Windows setting for Short date)
 %t - a time (default picture token: @t7, Windows setting for Short time)
+%u - an url encoded string (the spaces get encoded to %20)
+%U - an url encoded string (the spaces get encoded to '+' sign)
 ```
 s,S,z,Z,i,I,f,e,d,t specifiers may have additional picture token.  
 Picture token must be any valid Clarion picture token terminated by @.  

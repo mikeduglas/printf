@@ -17,3 +17,7 @@
   MESSAGE(printf('Current datetime is %d@d1@ %t@t4@', TODAY(), CLOCK()))
   !- float, float in scientific notation
   MESSAGE(printf('%f = %e', 10.0/3.0, 10.0/3.0))
+  !- url encode (the spaces get encoded to %20)
+  MESSAGE(printf('%u', 'This is a simple & short test.'))
+  !- url encode (the spaces get encoded to '+' sign)
+  MESSAGE(printf('%U', 'This is a simple & short test.'))
