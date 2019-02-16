@@ -1,5 +1,5 @@
 !** printf function.
-!** 14.02.2019
+!** 16.02.2019
 !** mikeduglas66@yandex.com
 
   MEMBER
@@ -16,6 +16,8 @@
 printf                        PROCEDURE(STRING pFmt, | 
                                 <? p1>,  <? p2>,  <? p3>,  <? p4>,  <? p5>,  <? p6>,  <? p7>,  <? p8>,  <? p9>,  <? p10>, |
                                 <? p11>, <? p12>, <? p13>, <? p14>, <? p15>, <? p16>, <? p17>, <? p18>, <? p19>, <? p20>)
+allSpecifiers                   STRING('cCsSzZiIxXfedtuUmM')
+noArgSpecifiers                 STRING('mM')
 res                             ANY
 numOfArgs                       LONG(0)   !- number of arguments
 curArgNdx                       LONG(0)
@@ -80,16 +82,19 @@ tmp_picture                     STRING(20), AUTO
       END
       
       !- INLIST: There may be up to 25 liststring parameters
-      IF INLIST(pFmt[i+1], 'c', 'C', 's', 'S', 'z', 'Z', 'i', 'I', 'x', 'X', 'f', 'e', 'd', 't', 'u', 'U')
-        !- get next argument
-        curArgNdx += 1
-        IF curArgNdx > numOfArgs
-          !- no more arguments, copy rest of format string into res and break the loop
-          res = res & pFmt[i+1 : len]
-          BREAK
-        END
+!      IF INLIST(pFmt[i+1], 'c', 'C', 's', 'S', 'z', 'Z', 'i', 'I', 'x', 'X', 'f', 'e', 'd', 't', 'u', 'U', 'm', 'M')
+      IF INSTRING(pFmt[i+1], allSpecifiers)
+        IF NOT INSTRING(pFmt[i+1], noArgSpecifiers)
+          !- get next argument
+          curArgNdx += 1
+          IF curArgNdx > numOfArgs
+            !- no more arguments, copy rest of format string into res and break the loop
+            res = res & pFmt[i+1 : len]
+            BREAK
+          END
           
-        DO GetArg
+          DO GetArg
+        END
       END
         
       DO GetPictureToken
@@ -247,6 +252,14 @@ tmp_picture                     STRING(20), AUTO
           res = res & urlEncode(curArg, TRUE)
         END
         
+        i += 1
+
+      OF 'm'
+        res = res & ERROR()
+        i += 1
+     
+      OF 'M'
+        res = res & FILEERROR()
         i += 1
 
       END

@@ -21,3 +21,9 @@
   MESSAGE(printf('%u', 'This is a simple & short test.'))
   !- url encode (the spaces get encoded to '+' sign)
   MESSAGE(printf('%U', 'This is a simple & short test.'))
+  !- error message
+  COPY('w:\($$$)\???.txt', '1.txt')
+  IF ERRORCODE()
+    MESSAGE(printf('COPY(%Z, %Z) failed, error: %m', 'w:\($$$)\???.txt', '1.txt'))
+  END
+  

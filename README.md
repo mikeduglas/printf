@@ -23,6 +23,8 @@ the additional arguments following format are formatted and inserted in the resu
 %t - a time (default picture token: @t7, Windows setting for Short time)
 %u - an url encoded string (the spaces get encoded to %20)
 %U - an url encoded string (the spaces get encoded to '+' sign)
+%m - an error message returned by ERROR(); don't pass smth
+%M - an error message returned by FILEERROR(); don't pass smth
 ```
 s,S,z,Z,i,I,f,e,d,t specifiers may have additional picture token.  
 Picture token must be any valid Clarion picture token terminated by @.  
