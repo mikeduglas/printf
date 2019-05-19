@@ -28,6 +28,7 @@ i                               LONG, AUTO
 j                               LONG, AUTO
 k                               LONG, AUTO
 tmp_int                         LONG, AUTO
+tmp_uint                        ULONG, AUTO
 tmp_double                      REAL, AUTO
 tmp_case                        BYTE, AUTO
 tmp_picture                     STRING(20), AUTO
@@ -186,16 +187,16 @@ tmp_picture                     STRING(20), AUTO
         
       OF 'x'    !%x: print out an int in hex (lower case)
       OROF 'X'  !%x: print out an int in hex (upper case)
-        tmp_int = curArg
+        tmp_uint = curArg
 
         IF pFmt[i+1] = 'x'
           tmp_case = TRUE
         ELSE
           tmp_case = FALSE
         END
-        IF tmp_int < 256
+        IF tmp_uint < 256
           res = res & ByteToHex(curArg, tmp_case)
-        ELSIF tmp_int < 65536
+        ELSIF tmp_uint < 65536
           res = res & ShortToHex(curArg, tmp_case)
         ELSE
           res = res & LongToHex(curArg, tmp_case)
