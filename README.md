@@ -16,6 +16,8 @@ Function *printd* outputs formatted string into debug log.
 %S - a quoted CLIPped string
 %z - a not clipped string
 %Z - a quoted not clipped string
+%b - a boolean (true/false)
+%B - a boolean (TRUE/FALSE)
 %i - an integer
 %I - signed integer (with leading + for positive argument)
 %x - an int in hex (lower case)

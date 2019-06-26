@@ -21,7 +21,7 @@
 printf                        PROCEDURE(STRING pFmt, | 
                                 <? p1>,  <? p2>,  <? p3>,  <? p4>,  <? p5>,  <? p6>,  <? p7>,  <? p8>,  <? p9>,  <? p10>, |
                                 <? p11>, <? p12>, <? p13>, <? p14>, <? p15>, <? p16>, <? p17>, <? p18>, <? p19>, <? p20>)
-allSpecifiers                   STRING('cCsSzZiIxXfedtuUmM')
+allSpecifiers                   STRING('cCsSzZbBiIxXfedtuUmM')
 noArgSpecifiers                 STRING('mM')
 res                             ANY
 numOfArgs                       LONG(0)   !- number of arguments
@@ -87,8 +87,6 @@ tmp_picture                     STRING(20), AUTO
         BREAK
       END
       
-      !- INLIST: There may be up to 25 liststring parameters
-!      IF INLIST(pFmt[i+1], 'c', 'C', 's', 'S', 'z', 'Z', 'i', 'I', 'x', 'X', 'f', 'e', 'd', 't', 'u', 'U', 'm', 'M')
       IF INSTRING(pFmt[i+1], allSpecifiers)
         IF NOT INSTRING(pFmt[i+1], noArgSpecifiers)
           !- get next argument
@@ -160,6 +158,18 @@ tmp_picture                     STRING(20), AUTO
           i += 1 + (k-j+1)
         END
         
+      OF 'b'      !%b: print out a true/false
+      OROF 'B'    !%B: print out a TRUE/FALSE
+        tmp_uint = curArg
+
+        IF pFmt[i+1] = 'b'
+          res = res & CHOOSE(tmp_uint <> 0, 'true', 'false')
+        ELSE
+          res = res & CHOOSE(tmp_uint <> 0, 'TRUE', 'FALSE')
+        END
+        
+        i += 1
+
       OF 'i'  !%i: print out an int
         tmp_int = curArg
         IF j = 0  !- no picture token
