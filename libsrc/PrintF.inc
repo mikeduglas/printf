@@ -1,5 +1,5 @@
 !** printf function.
-!** 16.02.2019
+!** 26.06.2019
 !** mikeduglas66@yandex.com
 
   MODULE('printf.clw')
@@ -37,6 +37,12 @@
 printf  PROCEDURE(STRING pFmt, | 
       <? p1>,  <? p2>,  <? p3>,  <? p4>,  <? p5>,  <? p6>,  <? p7>,  <? p8>,  <? p9>,  <? p10>, |
       <? p11>, <? p12>, <? p13>, <? p14>, <? p15>, <? p16>, <? p17>, <? p18>, <? p19>, <? p20>), STRING
+
+!!!<summary>Outputs formatted string into debug log.
+!!!</summary>
+printd  PROCEDURE(STRING pFmt, | 
+          <? p1>,  <? p2>,  <? p3>,  <? p4>,  <? p5>,  <? p6>,  <? p7>,  <? p8>,  <? p9>,  <? p10>, |
+          <? p11>, <? p12>, <? p13>, <? p14>, <? p15>, <? p16>, <? p17>, <? p18>, <? p19>, <? p20>)
   END
 
   PRAGMA('compile(printf.CLW)')

@@ -1,5 +1,5 @@
 !** printf function.
-!** 16.02.2019
+!** 26.06.2019
 !** mikeduglas66@yandex.com
 
   MEMBER
@@ -7,10 +7,15 @@
   PRAGMA('compile(CWUTIL.CLW)')
 
   MAP
+    MODULE('win api')
+      winapi::OutputDebugString(*CSTRING lpOutputString), PASCAL, RAW, NAME('OutputDebugStringA')
+    END
+
     INCLUDE('CWUTIL.INC'),ONCE
     INCLUDE('printf.inc'), ONCE
 
     urlEncode(STRING str, BOOL spaceAsPlus), STRING, PRIVATE
+    DebugInfo(STRING pMsg), PRIVATE
   END
 
 printf                        PROCEDURE(STRING pFmt, | 
@@ -334,3 +339,17 @@ i                               LONG, AUTO
   END
   
   RETURN encoded
+
+DebugInfo                     PROCEDURE(STRING pMsg)
+cs                              &CSTRING
+  CODE
+  cs &= NEW CSTRING(LEN(pMsg) + 1)
+  cs = CLIP(pMsg)
+  winapi::OutputDebugString(cs)
+  DISPOSE(cs)
+
+printd                        PROCEDURE(STRING pFmt, | 
+                                <? p1>,  <? p2>,  <? p3>,  <? p4>,  <? p5>,  <? p6>,  <? p7>,  <? p8>,  <? p9>,  <? p10>, |
+                                <? p11>, <? p12>, <? p13>, <? p14>, <? p15>, <? p16>, <? p17>, <? p18>, <? p19>, <? p20>)
+  CODE
+  DebugInfo(printf(pFmt, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15, p16, p17, p18, p19, p20))
