@@ -1,5 +1,5 @@
 !** printf function.
-!** 26.06.2019
+!** 23.08.2019
 !** mikeduglas66@yandex.com
 
   MEMBER
@@ -37,6 +37,7 @@ tmp_uint                        ULONG, AUTO
 tmp_double                      REAL, AUTO
 tmp_case                        BYTE, AUTO
 tmp_picture                     STRING(20), AUTO
+eqCRLF                          STRING('<13,10>')
   CODE
   IF NOT OMITTED(p1); numOfArgs += 1
     IF NOT OMITTED(p2); numOfArgs += 1
@@ -82,7 +83,8 @@ tmp_picture                     STRING(20), AUTO
   len = LEN(pFmt)
 
   LOOP i = 1 TO len
-    IF pFmt[i] = '%'
+    CASE pFmt[i] 
+    OF '%'
       IF i = len
         BREAK
       END
@@ -279,6 +281,15 @@ tmp_picture                     STRING(20), AUTO
         i += 1
 
       END
+      
+    OF '|'  !- pipe symbol
+      IF i < len AND pFmt[i+1] = '|'  ! || - print out a single | (pipe)
+        res = res & pFmt[i]
+        i += 1
+      ELSE  !- replace pipe with CRLF
+        res = res & eqCRLF
+      END
+      
     ELSE
       res = res & pFmt[i]
     END

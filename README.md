@@ -4,6 +4,8 @@ Function *printf* returns the string pointed by 1st argument pFmt.
 If pFmt includes format specifiers (subsequences beginning with %),  
 the additional arguments following format are formatted and inserted in the resulting string replacing their respective specifiers.  
 
+**NEW**: Pipe symbol "|" will be replaced with <13,10> (CR LF) sequence. To print pipe itself use 2 pipes ||.
+
 Function *printd* outputs formatted string into debug log.  
   
   
