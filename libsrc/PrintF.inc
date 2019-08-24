@@ -1,5 +1,5 @@
 !** printf function.
-!** 23.08.2019
+!** 24.08.2019
 !** mikeduglas66@yandex.com
 
   MODULE('printf.clw')
@@ -30,11 +30,11 @@
 !!!%U - an url encoded string (the spaces get encoded to '+' sign)
 !!!%m - an error message returned by ERROR(); don't pass smth
 !!!%M - an error message returned by FILEERROR(); don't pass smth
+!!!%| - CRLF sequence (new line)
 !!!
 !!!s,S,z,Z,i,I,f,e,d,t specifiers may have additional picture token.
 !!!Picture token must be any valid Clarion picture token terminated by @.
 !!!For example: %d@d10-@ - date value formatted as yyyy-mm-dd.
-!!!Pipe symbol "|" will be replaced with <13,10> (CR LF) sequence. To print pipe itself use 2 pipes ||.
 !!!</param>
 !!!<returns>Formatted string</returns>
 printf  PROCEDURE(STRING pFmt, | 

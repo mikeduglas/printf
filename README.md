@@ -4,8 +4,6 @@ Function *printf* returns the string pointed by 1st argument pFmt.
 If pFmt includes format specifiers (subsequences beginning with %),  
 the additional arguments following format are formatted and inserted in the resulting string replacing their respective specifiers.  
 
-**NEW**: Pipe symbol "|" will be replaced with <13,10> (CR LF) sequence. To print pipe itself use 2 pipes ||.
-
 Function *printd* outputs formatted string into debug log.  
   
   
@@ -32,6 +30,7 @@ Function *printd* outputs formatted string into debug log.
 %U - an url encoded string (the spaces get encoded to '+' sign)
 %m - an error message returned by ERROR(); don't pass smth
 %M - an error message returned by FILEERROR(); don't pass smth
+%| - CRLF sequence (new line)
 ```
 s,S,z,Z,i,I,f,e,d,t specifiers may have additional picture token.  
 Picture token must be any valid Clarion picture token terminated by @.  

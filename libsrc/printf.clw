@@ -1,5 +1,5 @@
 !** printf function.
-!** 23.08.2019
+!** 24.08.2019
 !** mikeduglas66@yandex.com
 
   MEMBER
@@ -272,22 +272,17 @@ eqCRLF                          STRING('<13,10>')
         
         i += 1
 
-      OF 'm'
+      OF 'm'    !- ERROR()
         res = res & ERROR()
         i += 1
      
-      OF 'M'
+      OF 'M'    !- FILEERROR()
         res = res & FILEERROR()
         i += 1
 
-      END
-      
-    OF '|'  !- pipe symbol
-      IF i < len AND pFmt[i+1] = '|'  ! || - print out a single | (pipe)
-        res = res & pFmt[i]
-        i += 1
-      ELSE  !- replace pipe with CRLF
+      OF '|'    !- CRLF
         res = res & eqCRLF
+        i += 1
       END
       
     ELSE

@@ -27,6 +27,5 @@
     MESSAGE(printf('COPY(%Z, %Z) failed, error: %m', 'w:\($$$)\???.txt', '1.txt'))
   END
   !- Multiline message
-  MESSAGE(printf('%s|%s|%s', 'Line 1', 'Line 2', 'Line 3'))
-  printd('%s|%s||%s', 'Line 1', 'Line 2', 'Line 2 continued')
+  MESSAGE(printf('%s%|%s%|%s', 'Line 1', 'Line 2', 'Line 3'))
   RETURN
