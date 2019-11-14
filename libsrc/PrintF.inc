@@ -28,6 +28,8 @@
 !!!%t - a time (default picture token: @t7, Windows setting for Short time)
 !!!%u - an url encoded string (the spaces get encoded to %20)
 !!!%U - an url encoded string (the spaces get encoded to '+' sign)
+!!!%v - a base64 encoded string
+!!!%w - a base64 decoded string
 !!!%m - an error message returned by ERROR(); don't pass smth
 !!!%M - an error message returned by FILEERROR(); don't pass smth
 !!!%| - CRLF sequence (new line)

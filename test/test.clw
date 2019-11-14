@@ -5,6 +5,9 @@
   END
 
   CODE
+  !- base64 encoding
+  printd('%w', printf('%v', 'В Крыму заявили, что угрозы украинских властей отреагировать на запуск поездов по Крымскому мосту являются попыткой вмешательства во внутренние дела России.'))
+  
   !- CLIPped string
   MESSAGE(printf('Hello %s!', 'world'))
   !- CLIPped string, unCLIPped string, number, hex, HEX

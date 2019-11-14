@@ -14,14 +14,27 @@
     INCLUDE('CWUTIL.INC'),ONCE
     INCLUDE('printf.inc'), ONCE
 
-    urlEncode(STRING str, BOOL spaceAsPlus), STRING, PRIVATE
+    Url::Encode(STRING str, BOOL spaceAsPlus), STRING, PRIVATE
+
+    Base64::EncodeBlock(STRING in, *STRING out, LONG len), PRIVATE
+    Base64::Encode(STRING input_buf), STRING, PRIVATE
+    Base64::Decode(STRING input_buf), STRING, PRIVATE
+
     DebugInfo(STRING pMsg), PRIVATE
   END
+
+!- base64 encoding data
+cb64                          STRING('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/')
+DECODED_BUF_SIZE              EQUATE(54)    !54 characters per line
+ENCODED_BUF_SIZE              EQUATE(72)    !54 * 4 / 3
+
+!- base64 decoding data
+B64index                      STRING('<0>{43}<62,63,62,62,63,52,53,54,55,56,57,58,59,60,61><0>{8}<1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,0,0,0,0,63,0,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51><0>{133}')
 
 printf                        PROCEDURE(STRING pFmt, | 
                                 <? p1>,  <? p2>,  <? p3>,  <? p4>,  <? p5>,  <? p6>,  <? p7>,  <? p8>,  <? p9>,  <? p10>, |
                                 <? p11>, <? p12>, <? p13>, <? p14>, <? p15>, <? p16>, <? p17>, <? p18>, <? p19>, <? p20>)
-allSpecifiers                   STRING('cCsSzZbBiIxXfedtuUmM')
+allSpecifiers                   STRING('cCsSzZbBiIxXfedtuUmMvw')
 noArgSpecifiers                 STRING('mM')
 res                             ANY
 numOfArgs                       LONG(0)   !- number of arguments
@@ -265,11 +278,19 @@ eqCRLF                          STRING('<13,10>')
       OF    'u' !- url encoded string (the spaces get encoded to %20)
       OROF  'U' !- url encoded string (the spaces get encoded to '+' sign)
         IF pFmt[i+1] = 'u' 
-          res = res & urlEncode(curArg, FALSE)
+          res = res & Url::Encode(curArg, FALSE)
         ELSE
-          res = res & urlEncode(curArg, TRUE)
+          res = res & Url::Encode(curArg, TRUE)
         END
         
+        i += 1
+
+      OF 'v'    !- base64 encoding
+        res = res & Base64::Encode(CLIP(curArg))
+        i += 1
+
+      OF 'w'    !- base64 decoding
+        res = res & Base64::Decode(CLIP(curArg))
         i += 1
 
       OF 'm'    !- ERROR()
@@ -330,7 +351,7 @@ GetArg                        ROUTINE
     curArg = p20
   END
   
-urlEncode                     PROCEDURE(STRING str, BOOL spaceAsPlus)
+Url::Encode                   PROCEDURE(STRING str, BOOL spaceAsPlus)
 encoded                         ANY
 c                               STRING(1), AUTO
 v                               BYTE, AUTO
@@ -355,6 +376,111 @@ i                               LONG, AUTO
   END
   
   RETURN encoded
+  
+Base64::EncodeBlock           PROCEDURE(STRING in, *STRING out, LONG len)
+  CODE
+!  {
+!  out[0] = cb64[ in[0] >> 2 ];
+!  out[1] = cb64[ ((in[0] & 0x03) << 4) | ((in[1] & 0xf0) >> 4) ];
+!  out[2] = (unsigned char) (len > 1 ? cb64[ ((in[1] & 0x0f) << 2) | ((in[2] & 0xc0) >> 6) ] : '=');
+!  out[3] = (unsigned char) (len > 2 ? cb64[ in[2] & 0x3f ] : '=');
+!  }
+
+  ASSERT(LEN(in) = 3 AND LEN(out) = 4)
+  out[1] = cb64[BSHIFT(VAL(in[1]), -2) + 1]
+  out[2] = cb64[BOR(BSHIFT(BAND(VAL(in[1]), 003h), 4), BSHIFT(BAND(VAL(in[2]), 0f0h), -4)) + 1]
+  IF len > 1
+    out[3] = cb64[BOR(BSHIFT(BAND(VAL(in[2]), 00fh), 2), BSHIFT(BAND(VAL(in[3]), 0c0h), -6)) + 1]
+  ELSE
+    out[3] = '='
+  END
+  IF len > 2
+    out[4] = cb64[BAND(VAL(in[3]), 03fh) + 1]
+  ELSE
+    out[4] = '='
+  END
+    
+Base64::Encode                PROCEDURE(STRING input_buf)
+input_size                      LONG, AUTO
+output_buf                      STRING((LEN(input_buf)/DECODED_BUF_SIZE + 1) * ENCODED_BUF_SIZE)
+in                              STRING(3), AUTO
+out                             STRING(4), AUTO
+iIndex                          LONG, AUTO
+block_size                      LONG, AUTO    !block size
+sIndex                          LONG, AUTO    !pos in input_buf
+n_block                         LONG, AUTO    !block number
+  CODE
+  input_size = LEN(input_buf)
+  n_block = 0
+  
+  LOOP sIndex = 1 TO input_size BY 3
+    block_size = 0
+    LOOP iIndex = 1 TO 3
+      IF sIndex + (iIndex - 1) <= input_size
+        in[iIndex] = input_buf[sIndex + (iIndex - 1)]
+        block_size += 1
+      ELSE
+        in[iIndex] = 0
+      END
+    END
+    
+    IF block_size
+      Base64::EncodeBlock(in, out, block_size)
+
+      n_block += 1
+      output_buf[(n_block - 1) * 4 + 1 : n_block * 4] = out
+    END
+  END
+  
+  RETURN CLIP(output_buf)
+
+Base64::Decode                PROCEDURE(STRING input_buf)
+len                             LONG, AUTO
+str                             STRING((3 * (LEN(CLIP(input_buf)) + 3) / 4) + 1)
+pad                             LONG(0)
+L                               LONG, AUTO
+i                               LONG, AUTO
+j                               LONG, AUTO
+c1                              BYTE, AUTO
+c2                              BYTE, AUTO
+c3                              BYTE, AUTO
+c4                              BYTE, AUTO
+n                               LONG, AUTO
+  CODE
+  len = LEN(CLIP(input_buf))
+  IF len AND ((len % 4) OR input_buf[len] = '=')
+    pad = 1
+  END
+  
+  L = INT((len + 3) / 4 - pad) * 4
+  
+  j = 1
+  LOOP i = 1 TO L BY 4
+    c1 = VAL(input_buf[i+0])+1; c1 = VAL(B64index[c1])
+    c2 = VAL(input_buf[i+1])+1; c2 = VAL(B64index[c2])
+    c3 = VAL(input_buf[i+2])+1; c3 = VAL(B64index[c3])
+    c4 = VAL(input_buf[i+3])+1; c4 = VAL(B64index[c4])
+    n = BOR(BSHIFT(c1, 18), BOR(BSHIFT(c2, 12), BOR(BSHIFT(c3, 6), c4)))
+    
+    str[j] = CHR(BSHIFT(n, -16));             j+=1
+    str[j] = CHR(BAND(BSHIFT(n, -8), 0FFh));  j+=1
+    str[j] = CHR(BAND(n, 0FFh));              j+=1
+  END
+  
+  IF pad
+    c1 = VAL(input_buf[L+1])+1; c1 = VAL(B64index[c1])
+    c2 = VAL(input_buf[L+2])+1; c2 = VAL(B64index[c2])
+    n = BOR(BSHIFT(c1, 18), BSHIFT(c2, 12))
+    str[j] = CHR(BSHIFT(n, -16))
+    
+    IF (len > L + 2) AND (input_buf[L + 3] <> '=')
+      c3 = VAL(input_buf[L+3])+1; c3 = VAL(B64index[c3])
+      n = BOR(n, BSHIFT(c3, 6))
+      str[j+1] = CHR(BAND(BSHIFT(n, -8), 0FFh))
+    END
+  END
+  
+  RETURN CLIP(str)
 
 DebugInfo                     PROCEDURE(STRING pMsg)
 cs                              &CSTRING
