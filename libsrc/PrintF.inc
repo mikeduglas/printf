@@ -1,8 +1,8 @@
 !** printf function.
 !** 24.08.2019
-!** mikeduglas66@yandex.com
+!** mikeduglas@yandex.ru
 
-  MODULE('printf.clw')
+  MODULE('printf')
 
 !!!<summary>Returns the string pointed by pFmt. 
 !!!If pFmt includes format specifiers (subsequences beginning with %), 

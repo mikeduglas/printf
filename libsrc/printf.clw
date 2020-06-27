@@ -1,6 +1,6 @@
 !** printf function.
 !** 24.08.2019
-!** mikeduglas66@yandex.com
+!** mikeduglas@yandex.ru
 
   MEMBER
 
