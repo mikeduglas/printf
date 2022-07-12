@@ -1,17 +1,14 @@
 !** printf function.
-!** 24.08.2019
+!** 12.07.2022
 !** mikeduglas@yandex.ru
 
   MEMBER
-
-  PRAGMA('compile(CWUTIL.CLW)')
 
   MAP
     MODULE('win api')
       winapi::OutputDebugString(*CSTRING lpOutputString), PASCAL, RAW, NAME('OutputDebugStringA')
     END
 
-    INCLUDE('CWUTIL.INC'),ONCE
     INCLUDE('printf.inc'), ONCE
 
     Url::Encode(STRING str, BOOL spaceAsPlus), STRING, PRIVATE
@@ -19,6 +16,8 @@
     Base64::EncodeBlock(STRING in, *STRING out, LONG len), PRIVATE
     Base64::Encode(STRING input_buf), STRING, PRIVATE
     Base64::Decode(STRING input_buf), STRING, PRIVATE
+
+    DecToHex(LONG pDecVal, BOOL pLowerCase=FALSE), STRING, PRIVATE
 
     DebugInfo(STRING pMsg), PRIVATE
   END
@@ -123,14 +122,11 @@ eqCRLF                          STRING('<13,10>')
         res = res & pFmt[i]
         i += 1
         
-      OF    'c'  !%c: print out a character
-      OROF  'C'  !%C: print out an uppercased Character
-        IF pFmt[i+1] = 'c'
-          res = res & SUB(curArg, 1, 1)
-        ELSE
-          res = res & UPPER(SUB(curArg, 1, 1))
-        END
-        
+      OF 'c'   !%c: print out a character
+        res = res & SUB(curArg, 1, 1)
+        i += 1
+      OF 'C'  !%C: print out an uppercased Character
+        res = res & UPPER(SUB(curArg, 1, 1))
         i += 1
 
       OF   's'  !%s: print out a clipped string
@@ -174,15 +170,12 @@ eqCRLF                          STRING('<13,10>')
         END
         
       OF 'b'      !%b: print out a true/false
-      OROF 'B'    !%B: print out a TRUE/FALSE
         tmp_uint = curArg
-
-        IF pFmt[i+1] = 'b'
-          res = res & CHOOSE(tmp_uint <> 0, 'true', 'false')
-        ELSE
-          res = res & CHOOSE(tmp_uint <> 0, 'TRUE', 'FALSE')
-        END
-        
+        res = res & CHOOSE(tmp_uint <> 0, 'true', 'false')
+        i += 1
+      OF 'B'      !%B: print out a TRUE/FALSE
+        tmp_uint = curArg
+        res = res & CHOOSE(tmp_uint <> 0, 'TRUE', 'FALSE')
         i += 1
 
       OF 'i'  !%i: print out an int
@@ -216,22 +209,12 @@ eqCRLF                          STRING('<13,10>')
         END
         
       OF 'x'    !%x: print out an int in hex (lower case)
-      OROF 'X'  !%x: print out an int in hex (upper case)
         tmp_uint = curArg
-
-        IF pFmt[i+1] = 'x'
-          tmp_case = TRUE
-        ELSE
-          tmp_case = FALSE
-        END
-        IF tmp_uint < 256
-          res = res & ByteToHex(curArg, tmp_case)
-        ELSIF tmp_uint < 65536
-          res = res & ShortToHex(curArg, tmp_case)
-        ELSE
-          res = res & LongToHex(curArg, tmp_case)
-        END
-        
+        res = res & DecToHex(tmp_uint, TRUE)
+        i += 1
+      OF 'X'    !%X: print out an int in hex (upper case)
+        tmp_uint = curArg
+        res = res & DecToHex(tmp_uint, FALSE)
         i += 1
         
       OF 'f'
@@ -275,14 +258,11 @@ eqCRLF                          STRING('<13,10>')
           i += 1 + (k-j+1)
         END
         
-      OF    'u' !- url encoded string (the spaces get encoded to %20)
-      OROF  'U' !- url encoded string (the spaces get encoded to '+' sign)
-        IF pFmt[i+1] = 'u' 
-          res = res & Url::Encode(curArg, FALSE)
-        ELSE
-          res = res & Url::Encode(curArg, TRUE)
-        END
-        
+      OF 'u' !- url encoded string (the spaces get encoded to %20)
+        res = res & Url::Encode(curArg, FALSE)
+        i += 1
+      OF 'U' !- url encoded string (the spaces get encoded to '+' sign)
+        res = res & Url::Encode(curArg, TRUE)
         i += 1
 
       OF 'v'    !- base64 encoding
@@ -370,8 +350,7 @@ i                               LONG, AUTO
       ELSE
         encoded = encoded &'%'
       END
-      
-      encoded = encoded & ByteToHex(v)
+      encoded = encoded & DecToHex(v)
     END
   END
   
@@ -482,10 +461,19 @@ n                               LONG, AUTO
   
   RETURN CLIP(str)
 
+DecToHex                      PROCEDURE(LONG pDecVal, BOOL pLowerCase=FALSE)
+sHex                            STRING(30)
+  CODE
+  LOOP UNTIL(~pDecVal)
+    sHex = SUB('0123456789ABCDEF',1+pDecVal % 16,1) & sHex
+    pDecVal = INT(pDecVal / 16)
+  END
+  RETURN CHOOSE(NOT pLowerCase, CLIP(sHex), LOWER(CLIP(sHex)))
+
 DebugInfo                     PROCEDURE(STRING pMsg)
 cs                              &CSTRING
   CODE
-  cs &= NEW CSTRING(LEN(pMsg) + 1)
+  cs &= NEW CSTRING(SIZE(pMsg) + 1)
   cs = CLIP(pMsg)
   winapi::OutputDebugString(cs)
   DISPOSE(cs)
