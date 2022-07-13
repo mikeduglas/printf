@@ -464,6 +464,9 @@ n                               LONG, AUTO
 DecToHex                      PROCEDURE(ULONG pDecVal, BOOL pLowerCase=FALSE)
 sHex                            STRING(30)
   CODE
+  IF pDecVal = 0
+    RETURN '0'
+  END
   LOOP UNTIL(~pDecVal)
     sHex = SUB('0123456789ABCDEF',1+pDecVal % 16,1) & sHex
     pDecVal = INT(pDecVal / 16)
