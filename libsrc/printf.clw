@@ -17,7 +17,7 @@
     Base64::Encode(STRING input_buf), STRING, PRIVATE
     Base64::Decode(STRING input_buf), STRING, PRIVATE
 
-    DecToHex(LONG pDecVal, BOOL pLowerCase=FALSE), STRING, PRIVATE
+    DecToHex(ULONG pDecVal, BOOL pLowerCase=FALSE), STRING, PRIVATE
 
     DebugInfo(STRING pMsg), PRIVATE
   END
@@ -461,7 +461,7 @@ n                               LONG, AUTO
   
   RETURN CLIP(str)
 
-DecToHex                      PROCEDURE(LONG pDecVal, BOOL pLowerCase=FALSE)
+DecToHex                      PROCEDURE(ULONG pDecVal, BOOL pLowerCase=FALSE)
 sHex                            STRING(30)
   CODE
   LOOP UNTIL(~pDecVal)
