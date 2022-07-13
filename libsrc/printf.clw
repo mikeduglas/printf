@@ -1,5 +1,5 @@
 !** printf function.
-!** 12.07.2022
+!** 13.07.2022
 !** mikeduglas@yandex.ru
 
   MEMBER
@@ -17,7 +17,7 @@
     Base64::Encode(STRING input_buf), STRING, PRIVATE
     Base64::Decode(STRING input_buf), STRING, PRIVATE
 
-    DecToHex(ULONG pDecVal, BOOL pLowerCase=FALSE), STRING, PRIVATE
+    HexFmt(LONG Lng),STRING, PRIVATE    !Carl function to replace CWUtil Hex
 
     DebugInfo(STRING pMsg), PRIVATE
   END
@@ -210,11 +210,11 @@ eqCRLF                          STRING('<13,10>')
         
       OF 'x'    !%x: print out an int in hex (lower case)
         tmp_uint = curArg
-        res = res & DecToHex(tmp_uint, TRUE)
+        res = res & LOWER(HexFmt(tmp_uint))
         i += 1
       OF 'X'    !%X: print out an int in hex (upper case)
         tmp_uint = curArg
-        res = res & DecToHex(tmp_uint, FALSE)
+        res = res & HexFmt(tmp_uint)
         i += 1
         
       OF 'f'
@@ -345,12 +345,7 @@ i                               LONG, AUTO
       encoded = encoded &'+'      
     ELSE
       v = VAL(c)
-      IF v < 16
-        encoded = encoded &'%0'
-      ELSE
-        encoded = encoded &'%'
-      END
-      encoded = encoded & DecToHex(v)
+      encoded = encoded &'%'& HexFmt(v)
     END
   END
   
@@ -461,17 +456,22 @@ n                               LONG, AUTO
   
   RETURN CLIP(str)
 
-DecToHex                      PROCEDURE(ULONG pDecVal, BOOL pLowerCase=FALSE)
-sHex                            STRING(30)
+HexFmt                        PROCEDURE(LONG Lng)!,STRING   !Carl: Replace CWUtil ByteToHex ShortToHex LongToHex 
+LngAdj                          LONG,AUTO 
+L                               BYTE,DIM(4),OVER(LngAdj)
+HEXCHARS                        STRING('0123456789ABCDEF')!,STATIC
+HX                              STRING(8),AUTO 
   CODE
-  IF pDecVal = 0
-    RETURN '0'
-  END
-  LOOP UNTIL(~pDecVal)
-    sHex = SUB('0123456789ABCDEF',1+pDecVal % 16,1) & sHex
-    pDecVal = INT(pDecVal / 16)
-  END
-  RETURN CHOOSE(NOT pLowerCase, CLIP(sHex), LOWER(CLIP(sHex)))
+  LngAdj = BAND(BSHIFT(Lng, -4),0F0F0F0Fh) + 01010101h
+  HX[1]=HEXCHARS[L[4]] ; HX[3]=HEXCHARS[L[3]] ; HX[5]=HEXCHARS[L[2]] ; HX[7]=HEXCHARS[L[1]]
+  LngAdj = BAND(Lng,0F0F0F0Fh)  + 01010101h
+  HX[2]=HEXCHARS[L[4]] ; HX[4]=HEXCHARS[L[3]] ; HX[6]=HEXCHARS[L[2]] ; HX[8]=HEXCHARS[L[1]]
+  CASE Lng
+  OF 0      TO 0FFh     ; RETURN Hx[7:8]
+  OF 100h   TO 0FFFFh   ; RETURN Hx[5:8]
+  OF 10000h TO 0FFFFFFh ; RETURN Hx[3:8]
+  ELSE                  ; RETURN Hx[1:8]
+  END   
 
 DebugInfo                     PROCEDURE(STRING pMsg)
 cs                              &CSTRING
