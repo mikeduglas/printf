@@ -63,7 +63,7 @@ then call printf(fmt, ...)  !- up to 21 arguments:
 C6.3 and newer.
 
 ## How to install
-Hit the 'Clone or Download' button and select 'Download Zip'.  
+Hit the 'Code' green button and select 'Download Zip'.  
 Now unzip printf-master.zip into a temporary folder somewhere.
 
 Copy the contents of "libsrc" folder into %ClarionRoot%\Accessory\libsrc\win  
