@@ -1,5 +1,5 @@
 !** printf function.
-!** 13.07.2022
+!** 22.10.2025
 !** mikeduglas@yandex.ru
 
   MODULE('printf')

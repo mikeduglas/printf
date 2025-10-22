@@ -1,3 +1,6 @@
+22.10.2025
+- FIX: Base64::Encode function (called by %v format specifier) filled the tail bytes with the "0" characters instead of zeros.
+
 13.07.2022
 - CHG: Faster hex convertion function.
 - CHG: %x, %X: The hex value is left padded with zero (again).

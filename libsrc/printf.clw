@@ -1,5 +1,5 @@
 !** printf function.
-!** 13.07.2022
+!** 22.10.2025
 !** mikeduglas@yandex.ru
 
   MEMBER
@@ -394,7 +394,7 @@ n_block                         LONG, AUTO    !block number
         in[iIndex] = input_buf[sIndex + (iIndex - 1)]
         block_size += 1
       ELSE
-        in[iIndex] = 0
+        in[iIndex] = '<0>'
       END
     END
     
